@@ -1,0 +1,7 @@
+.clean-button {
+    border: none;
+    background-color: transparent;
+}
+.delete-icon:hover {
+    color: red;
+}

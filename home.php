@@ -7,7 +7,19 @@ function get_cookie($conn, $var) {
 function get_post($conn, $var) {
   return $conn->real_escape_string(strip_tags(htmlspecialchars($_POST[$var])));
 }
-if (isset($_POST['message_post']) && isset($_COOKIE['token'])) { //Kui kasutaja teeb bookmarki
+function startsWith ($string, $startString) { 
+  $len = strlen($startString); 
+  return (substr($string, 0, $len) === $startString); 
+}
+function endsWith($string, $endString) { 
+    $len = strlen($endString); 
+    if ($len == 0) { 
+        return true; 
+    } 
+    return (substr($string, -$len) === $endString); 
+} 
+
+if (isset($_POST['message_post']) && isset($_COOKIE['token'])) { //If user makes bookmark
   require_once 'tem/loginDB.php';
   $conn = new mysqli($hn, $un, $pw, $db);
   if ($conn->connect_error) {
@@ -39,7 +51,7 @@ if (isset($_POST['message_post']) && isset($_COOKIE['token'])) { //Kui kasutaja 
 
   header("Location: ".$_SERVER['PHP_SELF'].$get_info);
   exit();
-} else if (isset($_POST['delete_id']) && isset($_COOKIE['token'])) { //Kui kasutaja kustutab bookmarki
+} else if (isset($_POST['delete_id']) && isset($_COOKIE['token'])) { //If user deletes bookmark
   require_once 'tem/loginDB.php';
   $conn = new mysqli($hn, $un, $pw, $db);
   if ($conn->connect_error) {
@@ -91,12 +103,36 @@ if (isset($_POST['message_post']) && isset($_COOKIE['token'])) { //Kui kasutaja 
       $result = $conn->query($query);
       if (!$result) die("Fatal Error");
 
+      //Displays all bookmarks for the user
       while($row = $result->fetch_assoc()) {
-        echo "<form action='home.php' method='POST'>
-            <b>" . strip_tags(htmlspecialchars($row['domain'])) . "</b>
+        $full = strip_tags(htmlspecialchars($row['domain']));
+        if (startsWith($full, "https://")) {
+          //Cleans display url
+          $clean = str_replace("https://","",$full);
+        } elseif (startsWith($clean, "http://")) {
+          //Cleans display url
+          $clean = str_replace("http://","",$full);
+        } else {
+          //If provided naked domain adds https to make the link valid
+          $clean = $full;
+          $full = "https://" . $full;
+        }
+
+        //Cleans "/" from the end of clean string
+        if (endsWith($clean, "/")) {
+          $clean = rtrim($clean, "/");
+        }
+
+
+        echo "
+        <div class='bookmark'>
+          <form action='home.php' method='POST'>
+          <img width=32 height=32 src='https://i.olsh.me/icon?size=32&url=". $full . "'>
+            <a target='_blank' href='". $full . "'><b>" . $clean . "</b></a>
             <input type='hidden' name='delete_id' value='" . $row['id'] . "'>
             <button aria-label='delete site' class='clean-button' type='submit'><i class='delete-icon fa fa-trash'></i></button>
-          </form>";
+          </form>
+        </div>";
       }
       $result->close();
       $conn->close();

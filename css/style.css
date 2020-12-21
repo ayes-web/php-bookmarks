@@ -5,3 +5,10 @@
 .delete-icon:hover {
     color: red;
 }
+.bookmark a {
+    font-size: 20px;
+    text-decoration: none;
+}
+.bookmark {
+    margin: 10px;
+}

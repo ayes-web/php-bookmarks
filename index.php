@@ -8,7 +8,10 @@
     <title>Index</title>
 </head>
 <body>
-    <h1 class="text-center">Welcome!</h1>
-    <div>Don't have account?<a href="register.php"> Register here.</a></div>
+    <div class="container">
+        <h1 class="text-center">Welcome!</h1>
+        <div class="text-center">Don't have account?<a href="register.php"> Register here.</a></div>
+        <div class="text-center">Already have account?<a href="home.php"> Click here.</a></div>
+    </div>
 </body>
 </html>
